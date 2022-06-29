@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="" />
+  <meta name="author" content="余风" />
+  <meta name="description" content="" />
+  
+  
+  <title>
+    
+      【翻译】点云配准（1）PCL点云配准API 
+      
+      
+      |
+    
+     Yufeng&#39;s Blog
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  
+<link rel="stylesheet" href="/css/color-scheme.css">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/comments.css">
+
+
+  <!-- jquery3.3.1 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- fancybox -->
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <script async src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js"></script>
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Oranges</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          <a href="/friends/">Friends</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+<!-- LaTex Display -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">【翻译】点云配准（1）PCL点云配准API</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime" title="更新时间"></i>
+          2020-12-02 23:30:55
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags" title="标签"></i>
+                
+                <span class="span--tag">
+                  <a href="/tags/PCL/" title="PCL">
+                    <b>#</b> PCL
+                  </a>
+                </span>
+                
+                <span class="span--tag">
+                  <a href="/tags/%E7%BF%BB%E8%AF%91/" title="翻译">
+                    <b>#</b> 翻译
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p>点云配准系列跳转链接：</p>
+<p><a target="_blank" rel="noopener" href="https://tgqyncdd.gitee.io/blog/2020/12/02/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86%EF%BC%881%EF%BC%89PCL%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86API/">第一节 PCL点云配准API</a></p>
+<blockquote>
+<p>主题: <font color=red>PCL 点云配准API</font></p>
+<p>作者: <em>Dirk Holz, Radu B. Rusu, Jochen Sprickerhof</em></p>
+<p>兼容: &gt; PCL 1.5</p>
+<p>这份文档将描述点云配准相关API及相关模块，包括：对应点的选取及错误点的去除，刚性变换矩阵的估计。</p>
+</blockquote>
+<h5 id="PCL点云配准API"><a href="#PCL点云配准API" class="headerlink" title="PCL点云配准API"></a>PCL点云配准API</h5><p>点云配准解决了将多个视角下的3D点云对齐形成一个完整模型的问题。其目标是找到全局坐标下单帧（多视角多张）点云的相对位置及方向，以使多幅点云的相交区域完美重叠。因此，需要一个能够将不同视点（视图）下的多组点云数据对齐到单个点云模型中的系统，以便点云的后续处理，例如点云分段（segmentation）和物体重建（reconstruction）。</p>
+<p><img src="https://pcl.readthedocs.io/projects/tutorials/en/latest/_images/scans.jpg" alt="img"></p>
+<p>如上图所示，通过倾斜2D激光单元（a tilting 2D laser unit）获取6个不同视角下的独立点云数据集。由于每幅点云只代表所扫描的世界（物体）的一小部分，因此必须将多幅点云数据进行配准，使其组成完整的点云模型，如下图所示：</p>
+<p><img src="https://pcl.readthedocs.io/projects/tutorials/en/latest/_images/s1-6.jpg"></p>
+<p>PCL点云配准库的主要算法工作是在给定的输入数据集中找到正确的点对应关系，并估计能将单独的点云数据集通过旋转平移操作转换到对应的全局坐标下的刚性变换矩阵。如果输入数据集已知点对应关系，则可以轻松进行点云配准。这意味着数据集中选中的对应点应该和另一个数据集中的对应点在特征上“重合”（coincide）。此外，如果估计的对应关系“完美”（perfect），那么该问题就能有封闭解决方案（a closed form solution）。</p>
+<p>PCL强大的算法能够估算多组对应关系并删除错误对应关系，同时获得可靠的刚性转换方程。以下各节将分别描述它们。</p>
+<h5 id="点云配准概览"><a href="#点云配准概览" class="headerlink" title="点云配准概览"></a>点云配准概览</h5><p>我们一般将一对点云数据集配准称为点云的成对配准，其输出通常是一个4x4的刚性变换矩阵。该刚性变换矩阵一般用来对源数据集进行旋转和平移，使其与其他数据集（目标点云数据集）“完美”对齐。</p>
+<p>下图显示了点云配准的一般过程。需要注意，该图只表示一次迭代过程，程序员可以自行决定迭代次数和算法步骤。</p>
+<p><img src="https://pcl.readthedocs.io/projects/tutorials/en/latest/_images/block_diagram_single_iteration.jpg"></p>
+<p>计算步骤如下所示：</p>
+<ul>
+<li>确定最能代表数据集中场景（scene）的兴趣点（关键点）【即下采样】。</li>
+<li>计算每个关键点的特征描述符。</li>
+<li>基于特征描述符的集合及关键点在数据集中的XYZ位置，根据两组数据集中关键点的特征和位置之间的相似性，估计一组点对应关系。</li>
+<li>由于存在噪点，并不是所有的对应关系都是正确，因此需要删除错误的对应关系。</li>
+<li>根据去除错误对应关系后的点对应关系，估计刚性变换矩阵。</li>
+</ul>
+<h5 id="点云配准模块"><a href="#点云配准模块" class="headerlink" title="点云配准模块"></a>点云配准模块</h5><p>以下是各个模块的详细解释。</p>
+<h6 id="关键点模块"><a href="#关键点模块" class="headerlink" title="关键点模块"></a>关键点模块</h6><p>关键点指场景中具有“特殊属性”的点，如一本书的边角或书封面上“PCL”这几个单词中的字母“P”。PCL中有多种方法检测关键点，包括NARF，SIFT和FAST。同时，也可以将单独的点或点的集合作为关键点。当将Kinect数据集作为输入来估计对应点时，如果每帧有300k点，那么就有可能存在300k^2个对应关系。</p>
+<h6 id="特征描述符"><a href="#特征描述符" class="headerlink" title="特征描述符"></a>特征描述符</h6><p>基于找到的关键点，可以进行特征直方图计算。直方图是一组向量，对其进行比较以确定对应关系。PCL提供了NARF，FPFH，BRIEF和SIFT等方法计算特征描述符。</p>
+<h6 id="点对应关系估计"><a href="#点对应关系估计" class="headerlink" title="点对应关系估计"></a>点对应关系估计</h6><p>给定通过两次扫描获取的两组点云的特征向量，我们需要对特征进行比较，找到对应特征才能找到点云数据中的重叠部分。根据特征类型，我们可以使用不同的方法来找到对应关系。</p>
+<p>点匹配时，根据有序点云和无序点云存在不同的点匹配方法（使用点的xyz坐标作为特征）：</p>
+<ul>
+<li><p>暴力匹配法。</p>
+</li>
+<li><p>KD树最近邻查找法（FLANN）。</p>
+</li>
+<li><p>有序点云的图像空间搜索法。</p>
+</li>
+<li><p>有序点云的索引空间搜索法。</p>
+</li>
+</ul>
+<p>特征匹配（不适用点的坐标进行匹配，而是使用特定特征）存在以下方法：</p>
+<ul>
+<li><p>暴力匹配法。</p>
+</li>
+<li><p>KD树最近邻查找法（FLANN）。</p>
+</li>
+</ul>
+<p>除搜索外，还区分了两种类型的对应估计：</p>
+<ul>
+<li>直接点云估计（默认）针对点云A的每个点在点云B中搜索对应点。</li>
+<li>”倒数（Reciprocal）“对应估计搜索从点云A搜索点云B的对应，再从点云B搜索点云A的对应，最终只使用交集部分。</li>
+</ul>
+<h6 id="错误点去除"><a href="#错误点去除" class="headerlink" title="错误点去除"></a>错误点去除</h6><p>当然，并不是所有的点对应关系都是正确的。由于错误的点对应关系会对最终的刚性转换矩阵产生负面影响，因此需要去除错误的点对应关系。一般使用RANSAC法或只使用找到的对应关系的一部分点。</p>
+<p>有时会存在一对多的特殊对应关系，其中一个数据集中的一个点对应另一个数据集中的多个点。可以通过检测距离，留下距离最小的对应点，或检查附近的其他匹配点进行滤波处理。</p>
+<h6 id="转换矩阵的估计"><a href="#转换矩阵的估计" class="headerlink" title="转换矩阵的估计"></a>转换矩阵的估计</h6><p>最后一步是计算转换矩阵。</p>
+<ul>
+<li><p>基于对应关系找出一些错误度量（error metric）。</p>
+</li>
+<li><p>估计摄像机位姿间的刚性变换矩阵（运动估计，motion estimate），并最小化误差度量。</p>
+</li>
+<li><p>优化点的结构。</p>
+</li>
+<li><p>举例：- SVD进行运动估计</p>
+<p>​           - 使用不同内核的Levenberg-Marquardt进行运动估计</p>
+</li>
+<li><p>使用刚性变换矩阵将源点云旋转/平移到目标点云上，并对所有点或部分关键点进行循环内部ICP（精配准）。</p>
+</li>
+<li><p>迭代直到满足收敛标准。</p>
+</li>
+</ul>
+<h6 id="整体流程总结"><a href="#整体流程总结" class="headerlink" title="整体流程总结"></a>整体流程总结</h6><p>ICP（Iterative Closest Point）迭代最近点</p>
+<ol>
+<li><p>寻找对应关系。</p>
+</li>
+<li><p>删除错误对应关系。</p>
+</li>
+<li><p>通过处理后的对应关系估计刚性变换矩阵。</p>
+</li>
+<li><p>迭代。</p>
+</li>
+</ol>
+<p>基于特征的配准</p>
+<ol>
+<li>SIFT获取关键点（pcl::SIFT…something）</li>
+<li>基于关键点获取FPFH特征描述符（pcl::FPFHEstimation）</li>
+<li>使用pcl::CorrespondenceEstimation获取FPFH描述符并估计对应关系。</li>
+<li>使用pcl::CorrespondenceRejectionXXX 删除错误对应关系</li>
+<li>最终获得刚性变换矩阵。</li>
+</ol>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2020/11/18/%E7%99%BD%E6%A1%A6/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime" title="更新时间"></i>
+              2020-12-02 23:30:55
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags" title="标签"></i>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/PCL/" title="PCL">
+                        <b>#</b> PCL
+                      </a>
+                    </span>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/%E7%BF%BB%E8%AF%91/" title="翻译">
+                        <b>#</b> 翻译
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2020/12/05/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86%EF%BC%882%EF%BC%89%E6%80%8E%E6%A0%B7%E4%BD%BF%E7%94%A8ICP/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#PCL%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86API"><span class="toc-text">PCL点云配准API</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86%E6%A6%82%E8%A7%88"><span class="toc-text">点云配准概览</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86%E6%A8%A1%E5%9D%97"><span class="toc-text">点云配准模块</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E7%82%B9%E6%A8%A1%E5%9D%97"><span class="toc-text">关键点模块</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%89%B9%E5%BE%81%E6%8F%8F%E8%BF%B0%E7%AC%A6"><span class="toc-text">特征描述符</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%82%B9%E5%AF%B9%E5%BA%94%E5%85%B3%E7%B3%BB%E4%BC%B0%E8%AE%A1"><span class="toc-text">点对应关系估计</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E9%94%99%E8%AF%AF%E7%82%B9%E5%8E%BB%E9%99%A4"><span class="toc-text">错误点去除</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E8%BD%AC%E6%8D%A2%E7%9F%A9%E9%98%B5%E7%9A%84%E4%BC%B0%E8%AE%A1"><span class="toc-text">转换矩阵的估计</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%B5%81%E7%A8%8B%E6%80%BB%E7%BB%93"><span class="toc-text">整体流程总结</span></a></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2022 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86%EF%BC%881%EF%BC%89PCL%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86API + '&url=' + http%3A%2F%2Fwww.yufeng.world%2F2020%2F12%2F02%2F%25E3%2580%2590%25E7%25BF%25BB%25E8%25AF%2591%25E3%2580%2591%25E7%2582%25B9%25E4%25BA%2591%25E9%2585%258D%25E5%2587%2586%25EF%25BC%25881%25EF%25BC%2589PCL%25E7%2582%25B9%25E4%25BA%2591%25E9%2585%258D%25E5%2587%2586API%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://www.yufeng.world/2020/12/02/%E3%80%90%E7%BF%BB%E8%AF%91%E3%80%91%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86%EF%BC%881%EF%BC%89PCL%E7%82%B9%E4%BA%91%E9%85%8D%E5%87%86API/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>

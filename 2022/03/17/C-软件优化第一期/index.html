@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN" color-mode="light">
+
+  <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="keywords" content="" />
+  <meta name="author" content="余风" />
+  <meta name="description" content="" />
+  
+  
+  <title>
+    
+      C++软件优化第一期 
+      
+      
+      |
+    
+     Yufeng&#39;s Blog
+  </title>
+
+  
+    <link rel="apple-touch-icon" href="/images/favicon.png">
+    <link rel="icon" href="/images/favicon.png">
+  
+
+  <!-- Raleway-Font -->
+  <link href="https://fonts.googleapis.com/css?family=Raleway&display=swap" rel="stylesheet">
+
+  <!-- hexo site css -->
+  
+<link rel="stylesheet" href="/css/color-scheme.css">
+<link rel="stylesheet" href="/css/base.css">
+<link rel="stylesheet" href="/iconfont/iconfont.css">
+<link rel="stylesheet" href="/css/github-markdown.css">
+<link rel="stylesheet" href="/css/highlight.css">
+<link rel="stylesheet" href="/css/comments.css">
+
+
+  <!-- jquery3.3.1 -->
+  <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+
+  <!-- fancybox -->
+  <link href="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.css" rel="stylesheet">
+  <script async src="https://cdn.bootcss.com/fancybox/3.5.2/jquery.fancybox.min.js"></script>
+  
+<script src="/js/fancybox.js"></script>
+
+
+  
+
+  <script>
+    var html = document.documentElement
+    const colorMode = localStorage.getItem('color-mode')
+    if (colorMode) {
+      document.documentElement.setAttribute('color-mode', colorMode)
+    }
+  </script>
+
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+  <body>
+    <div id="app">
+      <div class="header">
+  <div class="avatar">
+    <a href="/">
+      <!-- 头像取消懒加载，添加no-lazy -->
+      
+        <img src="/images/avatar.png" alt="">
+      
+    </a>
+    <div class="nickname"><a href="/">Oranges</a></div>
+  </div>
+  <div class="navbar">
+    <ul>
+      
+        <li class="nav-item" data-path="/">
+          <a href="/">Home</a>
+        </li>
+      
+        <li class="nav-item" data-path="/archives/">
+          <a href="/archives/">Archives</a>
+        </li>
+      
+        <li class="nav-item" data-path="/tags/">
+          <a href="/tags/">Tags</a>
+        </li>
+      
+        <li class="nav-item" data-path="/friends/">
+          <a href="/friends/">Friends</a>
+        </li>
+      
+        <li class="nav-item" data-path="/about/">
+          <a href="/about/">About</a>
+        </li>
+      
+    </ul>
+  </div>
+</div>
+
+
+<script src="/js/activeNav.js"></script>
+
+
+
+      <div class="flex-container">
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
+
+<!-- LaTex Display -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">C++软件优化第一期</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime" title="更新时间"></i>
+          2022-03-17 20:47:56
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags" title="标签"></i>
+                
+                <span class="span--tag">
+                  <a href="/tags/%E6%8A%80%E6%9C%AF/" title="技术">
+                    <b>#</b> 技术
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <h2 id="C-软件优化"><a href="#C-软件优化" class="headerlink" title="C++ 软件优化"></a>C++ 软件优化</h2><h3 id="一份适用于Windows、Linux、Mac平台的优化指南"><a href="#一份适用于Windows、Linux、Mac平台的优化指南" class="headerlink" title="一份适用于Windows、Linux、Mac平台的优化指南"></a>一份适用于Windows、Linux、Mac平台的优化指南</h3><h5 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h5><ol>
+<li><p>介绍</p>
+<p>1.1 为何软件总是运行很慢</p>
+<p>1.2 优化开销</p>
+</li>
+<li><p>选择优化平台</p>
+<p>2.1 选择硬件平台</p>
+<p>2.2 选择微处理器</p>
+<p>2.3 选择运行平台</p>
+<p>2.4 选择程序语言</p>
+<p>2.5 选择编译器</p>
+<p>2.6 选择函数库</p>
+<p>2.7 选择UI框架</p>
+<p>2.8 克服C++语言缺陷</p>
+</li>
+<li><p>寻找最大时间消耗点</p>
+<p>3.1 一个时钟周期是多长</p>
+<p>3.2 用性能分析器查找高消耗点（hot spots）</p>
+<p>3.3 程序安装</p>
+<p>3.4 自动更新</p>
+<p>3.5 程序载入</p>
+<p>3.6 动态链接和与存放环境无关的代码（position-independent code）</p>
+<p>3.7 文件访问</p>
+<p>3.8 系统数据库</p>
+<p>3.9 其他数据库</p>
+<p>3.10 图形图像</p>
+<p>3.11 其他系统资源</p>
+<p>3.12 网络资源</p>
+<p>3.13 内存资源</p>
+<p>3.14 上下文切换</p>
+<p>3.15 依赖链（dependency chains）</p>
+<p>3.16 执行单元输入（Execution unit throughput）</p>
+</li>
+<li><p>性能及稳定性</p>
+</li>
+<li><p>选择优化算法</p>
+</li>
+<li><p>Development process</p>
+</li>
+<li></li>
+</ol>
+<h4 id="一-介绍"><a href="#一-介绍" class="headerlink" title="一 介绍"></a>一 介绍</h4><p>        本手册适用于希望提升自己软件运行速度的高级程序员和软件开发人员。且本手册假设读者都掌握C++，并对编译原理有所了解的基础上编写，至于为何选择C++作为示例语言，后续将说明理由。</p>
+<p>        本手册主要基于对编译器和微处理器工作原理的研究， 主要基于 Intel、AMD 和 VIA 的 x86 系列微处理器（64 位版本）、及 Windows、Linux、BSD 和 Mac OS X 操作系统等常见平台。</p>
+<p>    </p>
+<h5 id="1-1-为何软件总是如此之慢"><a href="#1-1-为何软件总是如此之慢" class="headerlink" title="1.1 为何软件总是如此之慢"></a>1.1 为何软件总是如此之慢</h5><p>        一个悖论是：尽管几十年来微处理器的性能呈指数级增长，但我们仍然又许多响应时间长的让人沮丧的软件。而在大多数情况下，性能不理想的原因往往不是微处理器设计差，而是软件设计差。罪魁祸首便是极其浪费资源的软件开发工具、框架、虚拟机、脚本语言和抽象的多层软件设计。摩尔定律已经被打破，硬件性能的增长正在放缓，我们正在接近物理可能的极限。而根据Wirth定律，软件的下降速度比硬件的上升速度快得多。</p>
+<p>        因此，更建议软件开发人员不要想着依赖性能更强的微处理器，而应该将注意力放在软件的改进上。减少浪费资源的工具和框架的使用，减少繁琐的功能。正如手册中提到的，降低软件开发中的抽象级别实际上更容易理解不同代码结构的性能后果。</p>
+<h5 id="1-2-成本优化"><a href="#1-2-成本优化" class="headerlink" title="1.2 成本优化"></a>1.2 成本优化</h5><p>        现在的大学编程课程强调结构化和面向对象编程、模块化、可重用性、多层抽象和软件开发过程系统化的重要性。 这些要求往往与优化软件的速度或大小的要求相冲突。</p>
+<p>        如今，老师总是强调不要把函数超过多少多少行，而几十年前却是相反的：如果一个函数只被调用一次，就不要把它单独放到一个函数里。这种写作风格的变换主要是因为如今计算机性能更强，软件项目变得更大更复杂，人们更加关注软件开发的成本，而不是性能优化。</p>
+<p>        结构化软件开发的高优先级和程序效率的低优先级首先体现在编程语言和接口框架的选择上。 这对于必须投资购买功能越来越强大的计算机以跟上越来越大的软件包的用户通常是不利的，即使对于简单的任务，他们仍然对无法接受的长响应时间感到沮丧。</p>
+<p>        有时，为了使软件包更快更小，有必要在软件开发的高级原则上妥协。 本手册讨论了如何在这些考虑因素之间做出合理的平衡。 讨论了如何识别和隔离程序中最关键的部分，并将优化工作集中在该特定部分上。 讨论了如何克服相对原始的编程风格的危险，这种风格不能自动检查数组边界违规、无效指针等。讨论了哪些高级编程结构成本高，哪些便宜，与执行时间处理时间。</p>
+<p>        </p>
+<h4 id="二-选择最佳平台"><a href="#二-选择最佳平台" class="headerlink" title="二 选择最佳平台"></a>二 选择最佳平台</h4><h5 id="2-1-硬件平台的选择"><a href="#2-1-硬件平台的选择" class="headerlink" title="2.1 硬件平台的选择"></a>2.1 硬件平台的选择</h5><p>        硬件平台的选择已经不像过去那么重要了。 随着具有CISC指令集的标准PC处理器具有RISC内核、向量处理指令、多核以及处理速度超过 昨天的大型主机计算机。</p>
+<p>今天，为给定任务选择硬件平台通常取决于价格、兼容性、第二来源和良好开发工具的可用性等因素，而不是处理能力。 在网络中连接多台标准 PC 可能比投资大型主机更便宜、更高效。 具有大规模并行矢量处理能力的大型超级计算机在科学计算中仍然占有一席之地，但对于大多数用途而言，标准 PC 处理器是首选，因为它们具有卓越的性能/价格比。</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2022/02/20/VScode%E6%8F%92%E4%BB%B6%E6%94%BE%E7%BD%AE%E6%B8%B8%E6%88%8F%E5%BC%80%E5%8F%91%E8%AE%B0%E5%BD%9501/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime" title="更新时间"></i>
+              2022-03-17 20:47:56
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags" title="标签"></i>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/%E6%8A%80%E6%9C%AF/" title="技术">
+                        <b>#</b> 技术
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+              <a href="/2022/05/09/read-%E4%BA%94%E6%9C%88%E8%AF%BB%E4%BB%80%E4%B9%88/" target="_self">
+                <span>下一页</span>
+                <i class="iconfont icon-chevronright"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
+  </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#C-%E8%BD%AF%E4%BB%B6%E4%BC%98%E5%8C%96"><span class="toc-text">C++ 软件优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E4%BB%BD%E9%80%82%E7%94%A8%E4%BA%8EWindows%E3%80%81Linux%E3%80%81Mac%E5%B9%B3%E5%8F%B0%E7%9A%84%E4%BC%98%E5%8C%96%E6%8C%87%E5%8D%97"><span class="toc-text">一份适用于Windows、Linux、Mac平台的优化指南</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%AE%E5%BD%95"><span class="toc-text">目录</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80-%E4%BB%8B%E7%BB%8D"><span class="toc-text">一 介绍</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-1-%E4%B8%BA%E4%BD%95%E8%BD%AF%E4%BB%B6%E6%80%BB%E6%98%AF%E5%A6%82%E6%AD%A4%E4%B9%8B%E6%85%A2"><span class="toc-text">1.1 为何软件总是如此之慢</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#1-2-%E6%88%90%E6%9C%AC%E4%BC%98%E5%8C%96"><span class="toc-text">1.2 成本优化</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C-%E9%80%89%E6%8B%A9%E6%9C%80%E4%BD%B3%E5%B9%B3%E5%8F%B0"><span class="toc-text">二 选择最佳平台</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#2-1-%E7%A1%AC%E4%BB%B6%E5%B9%B3%E5%8F%B0%E7%9A%84%E9%80%89%E6%8B%A9"><span class="toc-text">2.1 硬件平台的选择</span></a></li></ol></li></ol></li></ol></li></ol>
+      
+    </div>
+  </div>
+
+  
+<script src="/js/catalog.js"></script>
+
+
+
+
+    
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
+    
+  </div>
+
+
+        
+<div class="footer">
+  <div class="social">
+    <ul>
+      
+        <li>
+          <a title="github" target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">
+            <i class="iconfont icon-github"></i>
+          </a>
+        </li>
+      
+    </ul>
+  </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Copyright © 2022 Oranges</a>
+        
+    </div>
+  
+    
+    <div class="footer-more">
+      
+        <a target="_blank" rel="noopener" href="https://github.com/zchengsite/hexo-theme-oranges">Theme by Oranges | Powered by Hexo</a>
+        
+    </div>
+  
+</div>
+
+      </div>
+
+      <div class="tools-bar">
+        <div class="back-to-top tools-bar-item hidden">
+  <a href="javascript: void(0)">
+    <i class="iconfont icon-chevronup"></i>
+  </a>
+</div>
+
+
+<script src="/js/backtotop.js"></script>
+
+
+
+        
+  <div class="search-icon tools-bar-item" id="search-icon">
+    <a href="javascript: void(0)">
+      <i class="iconfont icon-search"></i>
+    </a>
+  </div>
+
+  <div class="search-overlay hidden">
+    <div class="search-content" tabindex="0">
+      <div class="search-title">
+        <span class="search-icon-input">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-search"></i>
+          </a>
+        </span>
+        
+          <input type="text" class="search-input" id="search-input" placeholder="搜索...">
+        
+        <span class="search-close-icon" id="search-close-icon">
+          <a href="javascript: void(0)">
+            <i class="iconfont icon-close"></i>
+          </a>
+        </span>
+      </div>
+      <div class="search-result" id="search-result"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var inputArea = document.querySelector("#search-input")
+    var searchOverlayArea = document.querySelector(".search-overlay")
+
+    inputArea.onclick = function() {
+      getSearchFile()
+      this.onclick = null
+    }
+
+    inputArea.onkeydown = function() {
+      if(event.keyCode == 13)
+        return false
+    }
+
+    function openOrHideSearchContent() {
+      let isHidden = searchOverlayArea.classList.contains('hidden')
+      if (isHidden) {
+        searchOverlayArea.classList.remove('hidden')
+        document.body.classList.add('hidden')
+        // inputArea.focus()
+      } else {
+        searchOverlayArea.classList.add('hidden')
+        document.body.classList.remove('hidden')
+      }
+    }
+
+    function blurSearchContent(e) {
+      if (e.target === searchOverlayArea) {
+        openOrHideSearchContent()
+      }
+    }
+
+    document.querySelector("#search-icon").addEventListener("click", openOrHideSearchContent, false)
+    document.querySelector("#search-close-icon").addEventListener("click", openOrHideSearchContent, false)
+    searchOverlayArea.addEventListener("click", blurSearchContent, false)
+
+    var searchFunc = function (path, search_id, content_id) {
+      'use strict';
+      var $input = document.getElementById(search_id);
+      var $resultContent = document.getElementById(content_id);
+      $resultContent.innerHTML = "<ul><span class='local-search-empty'>首次搜索，正在载入索引文件，请稍后……<span></ul>";
+      $.ajax({
+        // 0x01. load xml file
+        url: path,
+        dataType: "xml",
+        success: function (xmlResponse) {
+          // 0x02. parse xml file
+          var datas = $("entry", xmlResponse).map(function () {
+            return {
+              title: $("title", this).text(),
+              content: $("content", this).text(),
+              url: $("url", this).text()
+            };
+          }).get();
+          $resultContent.innerHTML = "";
+
+          $input.addEventListener('input', function () {
+            // 0x03. parse query to keywords list
+            var str = '<ul class=\"search-result-list\">';
+            var keywords = this.value.trim().toLowerCase().split(/[\s\-]+/);
+            $resultContent.innerHTML = "";
+            if (this.value.trim().length <= 0) {
+              return;
+            }
+            // 0x04. perform local searching
+            datas.forEach(function (data) {
+              var isMatch = true;
+              var content_index = [];
+              if (!data.title || data.title.trim() === '') {
+                data.title = "Untitled";
+              }
+              var orig_data_title = data.title.trim();
+              var data_title = orig_data_title.toLowerCase();
+              var orig_data_content = data.content.trim().replace(/<[^>]+>/g, "");
+              var data_content = orig_data_content.toLowerCase();
+              var data_url = data.url;
+              var index_title = -1;
+              var index_content = -1;
+              var first_occur = -1;
+              // only match artiles with not empty contents
+              if (data_content !== '') {
+                keywords.forEach(function (keyword, i) {
+                  index_title = data_title.indexOf(keyword);
+                  index_content = data_content.indexOf(keyword);
+
+                  if (index_title < 0 && index_content < 0) {
+                    isMatch = false;
+                  } else {
+                    if (index_content < 0) {
+                      index_content = 0;
+                    }
+                    if (i == 0) {
+                      first_occur = index_content;
+                    }
+                    // content_index.push({index_content:index_content, keyword_len:keyword_len});
+                  }
+                });
+              } else {
+                isMatch = false;
+              }
+              // 0x05. show search results
+              if (isMatch) {
+                str += "<li><a href='" + data_url + "' class='search-result-title'>" + orig_data_title + "</a>";
+                var content = orig_data_content;
+                if (first_occur >= 0) {
+                  // cut out 100 characters
+                  var start = first_occur - 20;
+                  var end = first_occur + 80;
+
+                  if (start < 0) {
+                    start = 0;
+                  }
+
+                  if (start == 0) {
+                    end = 100;
+                  }
+
+                  if (end > content.length) {
+                    end = content.length;
+                  }
+
+                  var match_content = content.substr(start, end);
+
+                  // highlight all keywords
+                  keywords.forEach(function (keyword) {
+                    var regS = new RegExp(keyword, "gi");
+                    match_content = match_content.replace(regS, "<span class=\"search-keyword\">" + keyword + "</span>");
+                  });
+
+                  str += "<p class=\"search-result-abstract\">" + match_content + "...</p>"
+                }
+                str += "</li>";
+              }
+            });
+            str += "</ul>";
+            if (str.indexOf('<li>') === -1) {
+              return $resultContent.innerHTML = "<ul><span class='local-search-empty'>没有找到内容，请尝试更换检索词。<span></ul>";
+            }
+            $resultContent.innerHTML = str;
+          });
+        },
+        error: function(xhr, status, error) {
+          $resultContent.innerHTML = ""
+          if (xhr.status === 404) {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>未找到search.xml文件，具体请参考：<a href='https://github.com/zchengsite/hexo-theme-oranges#configuration' target='_black'>configuration</a><span></ul>";
+          } else {
+            $resultContent.innerHTML = "<ul><span class='local-search-empty'>请求失败，尝试重新刷新页面或稍后重试。<span></ul>";
+          }
+        }
+      });
+      $(document).on('click', '#search-close-icon', function() {
+        $('#search-input').val('');
+        $('#search-result').html('');
+      });
+    }
+
+    var getSearchFile = function() {
+        var path = "/search.xml";
+        searchFunc(path, 'search-input', 'search-result');
+    }
+  </script>
+
+
+
+
+        
+  <div class="tools-bar-item theme-icon" id="switch-color-scheme">
+    <a href="javascript: void(0)">
+      <i id="theme-icon" class="iconfont icon-moon"></i>
+    </a>
+  </div>
+
+  
+<script src="/js/colorscheme.js"></script>
+
+
+
+
+
+        
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + C%2B%2B%E8%BD%AF%E4%BB%B6%E4%BC%98%E5%8C%96%E7%AC%AC%E4%B8%80%E6%9C%9F + '&url=' + http%3A%2F%2Fwww.yufeng.world%2F2022%2F03%2F17%2FC-%25E8%25BD%25AF%25E4%25BB%25B6%25E4%25BC%2598%25E5%258C%2596%25E7%25AC%25AC%25E4%25B8%2580%25E6%259C%259F%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://www.yufeng.world/2022/03/17/C-%E8%BD%AF%E4%BB%B6%E4%BC%98%E5%8C%96%E7%AC%AC%E4%B8%80%E6%9C%9F/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
+  
+  
+<script src="/js/shares.js"></script>
+
+
+
+      </div>
+    </div>
+  </body>
+</html>
