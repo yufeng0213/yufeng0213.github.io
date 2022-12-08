@@ -11,8 +11,8 @@
   
   <title>
     
-      标签 
-       : 随笔
+      【随笔】我会死在下一个黄昏 
+      
       
       |
     
@@ -105,84 +105,133 @@
 
 
       <div class="flex-container">
-        <!-- 标签详情页，展示某个标签下的文章列表，url形式：https://yoursite/tags/某个标签/ -->
+        <!-- 文章详情页，展示文章具体内容，url形式：https://yoursite/文章标题/ -->
+<!-- 同时为「标签tag」，「朋友friend」，「分类categories」，「关于about」页面的承载页面，具体展示取决于page.type -->
 
-<div class="container tag-details">
-  <div class="content-title">
-    <h2>
-      <span>随笔</span>
-    </h2>
+<!-- LaTex Display -->
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script type="text/javascript" id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+</script>
+<script>
+MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+
+
+
+  
+
+  
+
+  
+
+  
+  <!-- 文章内容页 url形式：https://yoursite/文章标题/ -->
+  <div class="container post-details" id="post-details">
+    <div class="post-content">
+      <div class="post-title">【随笔】我会死在下一个黄昏</div>
+      <div class="post-attach">
+        <span class="post-pubtime">
+          <i class="iconfont icon-updatetime" title="更新时间"></i>
+          2022-12-08 23:09:17
+        </span>
+        
+              <span class="post-tags">
+                <i class="iconfont icon-tags" title="标签"></i>
+                
+                <span class="span--tag">
+                  <a href="/tags/%E9%9A%8F%E7%AC%94/" title="随笔">
+                    <b>#</b> 随笔
+                  </a>
+                </span>
+                
+              </span>
+          
+      </div>
+      <div class="markdown-body">
+        <p><strong>今日歌曲：</strong></p>
+<p><a target="_blank" rel="noopener" href="https://music.163.com/song?id=1356353412&userid=289410807">晚安，我爱你</a></p>
+<h3 id="序"><a href="#序" class="headerlink" title="序"></a><strong>序</strong></h3><p>绿绿快收拾完行李的时候终于收到那个男人“姗姗来迟”的信息，怀着满心酸涩中夹杂着的一丝隐藏的恐惧点开绿色软件，只有两句话。</p>
+<p>—— 嗯。</p>
+<p>—— 你回来吧。</p>
+<p>还是那么淡漠的语气，没有一丝感情。绿绿摸着手机迟疑着输入一串文字，又犹豫着挨个删除，想说些什么却觉得说什么都显得无力。</p>
+<p>对话框上那个男人的名字变成“正在输入中…”，可是迟迟没有新消息传过来，十一月的南方还没有太冷，只是偶尔一股凉风刮得窗外叶子簌簌响，才有了那么一点冬天的意思。绿绿不自觉裹紧大衣，男人的信息似乎还在编辑中。</p>
+<p>得有四五分钟，熄屏的手机叮一声亮起。</p>
+<p>—— 她的坟迁完了。</p>
+<h3 id="一"><a href="#一" class="headerlink" title="一"></a><strong>一</strong></h3><p>不在节假日出行的好处就是想买什么票就买什么，即使是硬卧的下铺。</p>
+
+      </div>
+      
+        <div class="prev-or-next">
+          <div class="post-foot-next">
+            
+              <a href="/2022/12/05/%E3%80%90%E5%B0%8F%E8%AF%B4%E3%80%91%E9%B8%B3%E9%B8%AF%E9%92%97/" target="_self">
+                <i class="iconfont icon-chevronleft"></i>
+                <span>上一页</span>
+              </a>
+            
+          </div>
+          <div class="post-attach">
+            <span class="post-pubtime">
+              <i class="iconfont icon-updatetime" title="更新时间"></i>
+              2022-12-08 23:09:17
+            </span>
+            
+                  <span class="post-tags">
+                    <i class="iconfont icon-tags" title="标签"></i>
+                    
+                    <span class="span--tag">
+                      <a href="/tags/%E9%9A%8F%E7%AC%94/" title="随笔">
+                        <b>#</b> 随笔
+                      </a>
+                    </span>
+                    
+                  </span>
+              
+          </div>
+          <div class="post-foot-prev">
+            
+          </div>
+        </div>
+      
+    </div>
+    
+  <div id="btn-catalog" class="btn-catalog">
+    <i class="iconfont icon-catalog"></i>
   </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="【随笔】我会死在下一个黄昏">
-        <span class="time-m-d">2022-12-08</span>
-        <a href="/2022/12/08/%E3%80%90%E9%9A%8F%E7%AC%94%E3%80%91%E6%88%91%E4%BC%9A%E6%AD%BB%E5%9C%A8%E4%B8%8B%E4%B8%80%E4%B8%AA%E9%BB%84%E6%98%8F/">
-          <span>【随笔】我会死在下一个黄昏</span>
-        </a>
-      </div>
+  <div class="post-catalog hidden" id="catalog">
+    <div class="title">目录</div>
+    <div class="catalog-content">
+      
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BA%8F"><span class="toc-text">序</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80"><span class="toc-text">一</span></a></li></ol>
+      
     </div>
+  </div>
+
   
-    <div class="post-list">
-      <div class="post-item" title="天堂镇or地狱——《天堂镇》观看随笔">
-        <span class="time-m-d">2021-10-24</span>
-        <a href="/2021/10/24/%E5%A4%A9%E5%A0%82%E9%95%87or%E5%9C%B0%E7%8B%B1%E2%80%94%E2%80%94%E3%80%8A%E5%A4%A9%E5%A0%82%E9%95%87%E3%80%8B%E8%A7%82%E7%9C%8B%E9%9A%8F%E7%AC%94/">
-          <span>天堂镇or地狱——《天堂镇》观看随笔</span>
-        </a>
-      </div>
-    </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="随便写写吧">
-        <span class="time-m-d">2021-03-01</span>
-        <a href="/2021/03/01/%E9%9A%8F%E4%BE%BF%E5%86%99%E5%86%99%E5%90%A7/">
-          <span>随便写写吧</span>
-        </a>
-      </div>
-    </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="当谈论游戏时，我想谈论什么">
-        <span class="time-m-d">2020-10-27</span>
-        <a href="/2020/10/27/%E5%BD%93%E8%B0%88%E8%AE%BA%E6%B8%B8%E6%88%8F%E6%97%B6%EF%BC%8C%E6%88%91%E6%83%B3%E8%B0%88%E8%AE%BA%E4%BB%80%E4%B9%88/">
-          <span>当谈论游戏时，我想谈论什么</span>
-        </a>
-      </div>
-    </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="冬日将至">
-        <span class="time-m-d">2020-07-30</span>
-        <a href="/2020/07/30/%E5%86%AC%E6%97%A5%E5%B0%86%E8%87%B3/">
-          <span>冬日将至</span>
-        </a>
-      </div>
-    </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="他死于他自己的法则">
-        <span class="time-m-d">2020-07-30</span>
-        <a href="/2020/07/30/%E4%BB%96%E6%AD%BB%E4%BA%8E%E4%BB%96%E8%87%AA%E5%B7%B1%E7%9A%84%E6%B3%95%E5%88%99/">
-          <span>他死于他自己的法则</span>
-        </a>
-      </div>
-    </div>
-  
-    <div class="post-list">
-      <div class="post-item" title="Hello My World">
-        <span class="time-m-d">2020-07-16</span>
-        <a href="/2020/07/16/hello-world/">
-          <span>Hello My World</span>
-        </a>
-      </div>
-    </div>
-  
-  <nav class="post-navigation">
+<script src="/js/catalog.js"></script>
+
+
+
+
     
-    <span class="page-num">1 / 1</span>
+      <div class="comments-container">
+        
+
+
+
+
+
+
+
+      </div>
     
-  </nav>
-</div>
+  </div>
+
 
         
 <div class="footer">
@@ -436,6 +485,24 @@
 
 
         
+  
+    <div class="share-icon tools-bar-item">
+      <a href="javascript: void(0)" id="share-icon">
+        <i class="iconfont iconshare"></i>
+      </a>
+      <div class="share-content hidden">
+        
+          <a class="share-item" href="https://twitter.com/intent/tweet?text=' + %E3%80%90%E9%9A%8F%E7%AC%94%E3%80%91%E6%88%91%E4%BC%9A%E6%AD%BB%E5%9C%A8%E4%B8%8B%E4%B8%80%E4%B8%AA%E9%BB%84%E6%98%8F + '&url=' + http%3A%2F%2Fwww.yufeng.world%2F2022%2F12%2F08%2F%25E3%2580%2590%25E9%259A%258F%25E7%25AC%2594%25E3%2580%2591%25E6%2588%2591%25E4%25BC%259A%25E6%25AD%25BB%25E5%259C%25A8%25E4%25B8%258B%25E4%25B8%2580%25E4%25B8%25AA%25E9%25BB%2584%25E6%2598%258F%2F + '" target="_blank" title="Twitter">
+            <i class="iconfont icon-twitter"></i>
+          </a>
+        
+        
+          <a class="share-item" href="https://www.facebook.com/sharer.php?u=http://www.yufeng.world/2022/12/08/%E3%80%90%E9%9A%8F%E7%AC%94%E3%80%91%E6%88%91%E4%BC%9A%E6%AD%BB%E5%9C%A8%E4%B8%8B%E4%B8%80%E4%B8%AA%E9%BB%84%E6%98%8F/" target="_blank" title="Facebook">
+            <i class="iconfont icon-facebooksquare"></i>
+          </a>
+        
+      </div>
+    </div>
   
   
 <script src="/js/shares.js"></script>
